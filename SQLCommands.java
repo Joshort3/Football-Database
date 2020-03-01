@@ -78,4 +78,39 @@ public class SQLCommands {
 		
 		return info;
 	}
+	public String playerTeamInfo(String first, String last, String year) {
+		String info = "";
+		String sqlStatement = "SELECT player.\"firstName\", player.\"lastName\", team.name, team.year FROM player ";
+		sqlStatement += "INNER JOIN team ON team.\"teamCode\" = player.\"teamCode\" ";
+		sqlStatement += "AND team.year = player.year AND player.\"lastName\" = " + last;
+		sqlStatement += " AND player.\"firstName\" = " + first;
+		 if(year != "all")
+			    sqlStatement += " AND player.year = " + year;
+		System.out.println(sqlStatement);
+		
+		try {
+		     //create a statement object
+		       Statement stmt = conn.createStatement();
+		       //create an SQL statement
+		       //send statement to DBMS
+		       ResultSet result = stmt.executeQuery(sqlStatement);
+
+		       //OUTPUT
+		       while (result.next()) {
+			     info += result.getString("firstName") + " " + result.getString("lastName") + " " + result.getString("name") + " " + result.getString("year");
+		    	 info += "\n";
+		       }
+		} catch (Exception e){
+	     System.out.println("Error accessing Database.");
+		}
+		
+		
+		
+		return info;
+	}
+	
+	public String playerStats(String first, String last, String year) {
+		String info = "";
+		return info;
+	}
 }
