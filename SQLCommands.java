@@ -4,12 +4,12 @@ public class SQLCommands {
 	
 	private Vector<String> tables;
 	private Vector<String> player = new Vector<String>(14);
-	private Vector<String> team;
-	private Vector<String> stadium;
-	private Vector<String> conference;
-	private Vector<String> games;
-	private Vector<String> playerGameStats;
-	private Vector<String> teamGameStats;
+	private Vector<String> team = new Vector<String>(4);
+	private Vector<String> stadium = new Vector<String>(8);
+	private Vector<String> conference = new Vector<String>(4);
+	private Vector<String> games = new Vector<String>(8);
+	private Vector<String> playerGameStats = new Vector<String>(30);
+	private Vector<String> teamGameStats = new Vector<String>(34);
 	private Connection conn;
 	
 	public SQLCommands() {
@@ -40,7 +40,15 @@ public class SQLCommands {
 		player.add("homeCountry");
 		player.add("lastSchool");
 		player.add("year");
-		
+		team.add("teamCode"); team.add("name"); team.add("conferenceCode"); team.add("year");
+		stadium.add("stadiumCode"); stadium.add("name"); stadium.add("city");
+		stadium.add("state");stadium.add("capacity"); stadium.add("surface");
+		stadium.add("yearOpened"); stadium.add("year");
+		conference.add("conferenceCode"); conference.add("name");
+		conference.add("subdivision"); conference.add("year");
+		games.add("gameCode"); games.add("date"); games.add("visitingTeamCode");
+		games.add("homeTeamCode");games.add("stadiumCode"); games.add("attendance");
+		games.add("duration"); games.add("year");
 	}
 	
 	public String playerInfo(String first, String last, String year) {
