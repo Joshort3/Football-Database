@@ -69,7 +69,7 @@ public class SQLCommands {
 		String sqlStatement = "SELECT * FROM player WHERE player.\"firstName\" = " + first;
 	    sqlStatement += " AND player.\"lastName\" = " + last;
 	    if(year != "all")
-	    sqlStatement += " AND year = " + year;
+	    	sqlStatement += " AND year = " + year;
 	    System.out.println(sqlStatement);
 		try {
 		     //create a statement object
@@ -373,4 +373,362 @@ public class SQLCommands {
 		return info;
 	}
 	
+	public String conferenceTeams(String conName, String year, boolean csv) {
+	String info = "";
+	String sqlStatement = "SELECT team.\"teamName\" ";
+	sqlStatement += "FROM public.team ";
+	sqlStatement += "INNER JOIN public.conference ";
+	sqlStatement += "ON conference.\"conferenceName\"= " + conName + " ";
+	sqlStatement += "AND team.\"conferenceCode\" = conference.\"conferenceCode\" ";
+	sqlStatement += "AND conference.\"year\" =" + year + " ";
+	sqlStatement += "AND team.\"year\" =" + year;
+	
+	System.out.println(sqlStatement);
+	
+	try {
+	     //create a statement object
+	       Statement stmt = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result = stmt.executeQuery(sqlStatement);
+	       
+	       
+	       if(!csv) {
+	    	   info += "teamName";
+	       }
+	       else {
+	    	   info += "teamName";
+	       }
+	       info += "\n";
+	       //OUTPUT
+	       while (result.next()) {
+	    	 if(!csv) {
+		    	 info += result.getString("teamName"); 
+	    	 }
+	    	 else {
+	    		 info += result.getString("teamName") + ","; 
+	    	 }
+	    	 info += "\n";
+	       }
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	
+	return info;
+}
+
+	public String allConferences(String year, boolean csv) {
+	String info = "";
+	String sqlStatement = "SELECT * FROM conference WHERE ";
+	sqlStatement += "conference.year = " + year;
+	System.out.println(sqlStatement);
+	
+	try {
+	     //create a statement object
+	       Statement stmt = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result = stmt.executeQuery(sqlStatement);
+	       
+	       info += "conferenceName\n";
+	       //OUTPUT
+	       while (result.next()) {
+	    	 if(!csv) {
+	    		 info += result.getString("conferenceName");
+	    	 }
+	    	 else {
+	    		 info += result.getString("conferenceName");
+	    	 }
+	    	 info += "\n";
+	       }
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	return info;
+}
+
+	public String gameInfo(String homeTeam, String visitingTeam, String year, boolean csv) {
+	String info = "";
+	
+	String sqlStatement = "SELECT stadium.\"stadiumName\", game.\"date\",game.\"attendance\", game.\"duration\" ";;
+	sqlStatement += "From public.game ";
+	sqlStatement += "INNER JOIN public.team ";
+	sqlStatement += "ON team.\"teamCode\" = game.\"visitingTeamCode\" ";
+	sqlStatement += "AND game.\"year\" = team.\"year\" ";
+	sqlStatement += "AND team.\"teamName\" =  " + visitingTeam + " ";
+	sqlStatement += "AND game.\"year\" = " + year + " ";
+	sqlStatement += "OR (team.\"teamCode\" = game.\"homeTeamCode\" AND game.\"year\" = team.\"year\" AND team.\"teamName\" = " + homeTeam + "  AND game.\"year\" = " + year + ") ";
+	sqlStatement += "INNER JOIN public.stadium ";
+	sqlStatement += "ON stadium.\"stadiumCode\" = game.\"stadiumCode\" ";
+	sqlStatement += "AND stadium.\"year\" = " + year + " ";
+	sqlStatement += "GROUP BY ";
+	sqlStatement += "stadium.\"stadiumName\", game.\"date\", game.\"attendance\", game.\"duration\" ";
+	sqlStatement += "HAVING  ";
+	sqlStatement += "COUNT(*) > 1; ";
+
+	System.out.println(sqlStatement);
+	
+	try {
+	     //create a statement object
+	       Statement stmt = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result = stmt.executeQuery(sqlStatement);
+	       
+	       if(!csv) {
+	    	  info += "stadiumName" + " " + "date" + " " + "attendance" + " " + "duration\n"; 
+	       }
+	       else {
+	    	   info += "stadiumName" + "," + "date" + "," + "attendance" + "," + "duration\n";
+	       }
+	       //OUTPUT
+	       while (result.next()) {
+	    	 if(!csv) {
+	    		 info += result.getString("stadiumName") + " " + result.getString("date") + " " + result.getString("attendance") + " " + result.getString("duration");
+	    	 }
+	    	 else {
+	    		 info += result.getString("stadiumName") + "," + result.getString("date") + "," + result.getString("attendance") + "," + result.getString("duration");
+	    	 }
+		     
+	    	 
+	       }
+	       info += "\n";
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	
+	return info;
+}
+
+	public String homeTeamStats(String homeTeam, String visitingTeam, String year, boolean csv) {
+	String info = "";
+	
+	String sqlStatement = "SELECT game.\"date\",\"teamGameStats\".\"rushAtt\", \"teamGameStats\".\"rushYard\", \"teamGameStats\".\"passAtt\", \"teamGameStats\".\"passComp\", \"teamGameStats\".\"passYard\", \"teamGameStats\".\"passInt\", \"teamGameStats\".\"fieldGoalAtt\", \"teamGameStats\".\"fieldGoalMade\", \"teamGameStats\".\"points\", \"teamGameStats\".\"fumble\", \"teamGameStats\".\"penalty\", \"teamGameStats\".\"penaltyYard\" ";
+	sqlStatement += "From public.game ";
+	sqlStatement += "INNER JOIN public.team ";
+	sqlStatement += "ON team.\"teamCode\" = game.\"visitingTeamCode\" ";
+	sqlStatement += "AND game.\"year\" = team.\"year\" ";
+	sqlStatement += "AND team.\"teamName\" =  " + visitingTeam + " ";
+	sqlStatement += "AND game.\"year\" = " + year + " ";
+	sqlStatement += "OR (team.\"teamCode\" = game.\"homeTeamCode\" AND game.\"year\" = team.\"year\" AND team.\"teamName\" = " + homeTeam + "  AND game.\"year\" = " + year + ") ";
+	sqlStatement += "INNER JOIN public.\"teamGameStats\" ";
+	sqlStatement += "ON \"teamGameStats\".\"gameCode\" = game.\"gameCode\" ";
+	sqlStatement += "AND \"teamGameStats\".\"teamCode\" = game.\"homeTeamCode\" ";
+	sqlStatement += "GROUP BY ";
+	sqlStatement += "game.\"date\",\"teamGameStats\".\"rushAtt\", \"teamGameStats\".\"rushYard\", \"teamGameStats\".\"passAtt\", \"teamGameStats\".\"passComp\", \"teamGameStats\".\"passYard\", \"teamGameStats\".\"passInt\", \"teamGameStats\".\"fieldGoalAtt\", \"teamGameStats\".\"fieldGoalMade\", \"teamGameStats\".\"points\", \"teamGameStats\".\"fumble\", \"teamGameStats\".\"penalty\", \"teamGameStats\".\"penaltyYard\" ";
+	sqlStatement += "HAVING  ";
+	sqlStatement += "COUNT(*) > 1; ";
+
+	System.out.println(sqlStatement);
+	
+	try {
+	     //create a statement object
+	       Statement stmt = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result = stmt.executeQuery(sqlStatement);
+
+	       
+	       if(!csv) {
+	    	  info += "date" + " " + " rushAtt" + " " + "rushYard" + " " + "passAtt" + " " + "passComp" + " " + "passYard" + " " + "passInt" + " " + "fieldGoalAtt" + " " + "fieldGoalMade" + " " + "points" + " " + "fumble" + " " + "penalty" + " " + "penaltyYard"; 
+	       }
+	       else {
+	    	   info += "date" + "," + " rushAtt" + "," + "rushYard" + "," + "passAtt" + "," + "passComp" + "," + "passYard" + "," + "passInt" + "," + "fieldGoalAtt" + "," + "fieldGoalMade" + "," + "points" + "," + "fumble" + "," + "penalty" + "," + "penaltyYard"; 
+	       }
+	       info += "\n";
+	       //OUTPUT
+	       while (result.next()) {
+	    	 if(!csv) {
+	    		 info += result.getString("date") + " " + result.getString("rushAtt") + " " + result.getString("rushYard") + " "  + result.getString("passAtt") + " " + result.getString("passComp") + " " + result.getString("passYard") + " " + result.getString("passInt") + " " + result.getString("fieldGoalAtt") + " " + result.getString("fieldGoalMade") + " " + result.getString("points") + " " + result.getString("fumble") + " " + result.getString("penalty") + " " + result.getString("penaltyYard");
+	    	 }
+	    	 else {
+	    		 info += result.getString("date") + "," + result.getString("rushAtt") + "," + result.getString("rushYard") + ","  + result.getString("passAtt") + "," + result.getString("passComp") + "," + result.getString("passYard") + "," + result.getString("passInt") + "," + result.getString("fieldGoalAtt") + "," + result.getString("fieldGoalMade") + "," + result.getString("points") + "," + result.getString("fumble") + "," + result.getString("penalty") + "," + result.getString("penaltyYard");
+	    	 }
+	    	 info+= "\n";
+	       }
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	
+	return info;
+}
+
+	public String visitingTeamStats(String homeTeam, String visitingTeam, String year, boolean csv) {
+	String info = "";
+	
+	String sqlStatement = "SELECT game.\"date\",\"teamGameStats\".\"rushAtt\", \"teamGameStats\".\"rushYard\", \"teamGameStats\".\"passAtt\", \"teamGameStats\".\"passComp\", \"teamGameStats\".\"passYard\", \"teamGameStats\".\"passInt\", \"teamGameStats\".\"fieldGoalAtt\", \"teamGameStats\".\"fieldGoalMade\", \"teamGameStats\".\"points\", \"teamGameStats\".\"fumble\", \"teamGameStats\".\"penalty\", \"teamGameStats\".\"penaltyYard\" ";
+	sqlStatement += "From public.game ";
+	sqlStatement += "INNER JOIN public.team ";
+	sqlStatement += "ON team.\"teamCode\" = game.\"visitingTeamCode\" ";
+	sqlStatement += "AND game.\"year\" = team.\"year\" ";
+	sqlStatement += "AND team.\"teamName\" =  " + visitingTeam + " ";
+	sqlStatement += "AND game.\"year\" = " + year + " ";
+	sqlStatement += "OR (team.\"teamCode\" = game.\"homeTeamCode\" AND game.\"year\" = team.\"year\" AND team.\"teamName\" = " + homeTeam + "  AND game.\"year\" = " + year + ") ";
+	sqlStatement += "INNER JOIN public.\"teamGameStats\" ";
+	sqlStatement += "ON \"teamGameStats\".\"gameCode\" = game.\"gameCode\" ";
+	sqlStatement += "AND \"teamGameStats\".\"teamCode\" = game.\"visitingTeamCode\" ";
+	sqlStatement += "GROUP BY ";
+	sqlStatement += "game.\"date\",\"teamGameStats\".\"rushAtt\", \"teamGameStats\".\"rushYard\", \"teamGameStats\".\"passAtt\", \"teamGameStats\".\"passComp\", \"teamGameStats\".\"passYard\", \"teamGameStats\".\"passInt\", \"teamGameStats\".\"fieldGoalAtt\", \"teamGameStats\".\"fieldGoalMade\", \"teamGameStats\".\"points\", \"teamGameStats\".\"fumble\", \"teamGameStats\".\"penalty\", \"teamGameStats\".\"penaltyYard\" ";
+	sqlStatement += "HAVING  ";
+	sqlStatement += "COUNT(*) > 1; ";
+
+	System.out.println(sqlStatement);
+	
+	try {
+	     //create a statement object
+	       Statement stmt = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result = stmt.executeQuery(sqlStatement);
+
+	       
+	       if(!csv) {
+	    	   info += "date" + " " + " rushAtt" + " " + "rushYard" + " " + "passAtt" + " " + "passComp" + " " + "passYard" + " " + "passInt" + " " + "fieldGoalAtt" + " " + "fieldGoalMade" + " " + "points" + " " + "fumble" + " " + "penalty" + " " + "penaltyYard";   
+	       }
+	       else {
+	    	   info += "date" + "," + " rushAtt" + "," + "rushYard" + "," + "passAtt" + "," + "passComp" + "," + "passYard" + "," + "passInt" + "," + "fieldGoalAtt" + "," + "fieldGoalMade" + "," + "points" + "," + "fumble" + "," + "penalty" + "," + "penaltyYard"; 
+	       }
+	       info += "\n";
+	       //OUTPUT
+	       while (result.next()) {
+	    	   if(!csv) {
+	    		   info += result.getString("date") + " " + result.getString("rushAtt") + " " + result.getString("rushYard") + " "  + result.getString("passAtt") + " " + result.getString("passComp") + " " + result.getString("passYard") + " " + result.getString("passInt") + " " + result.getString("fieldGoalAtt") + " " + result.getString("fieldGoalMade") + " " + result.getString("points") + " " + result.getString("fumble") + " " + result.getString("penalty") + " " + result.getString("penaltyYard");
+	    	   }
+	    	   else {
+	    		   info += result.getString("date") + "," + result.getString("rushAtt") + "," + result.getString("rushYard") + ","  + result.getString("passAtt") + "," + result.getString("passComp") + "," + result.getString("passYard") + "," + result.getString("passInt") + "," + result.getString("fieldGoalAtt") + "," + result.getString("fieldGoalMade") + "," + result.getString("points") + "," + result.getString("fumble") + "," + result.getString("penalty") + "," + result.getString("penaltyYard");
+	    	   }
+	    	   info += "\n";
+	       }
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	
+	return info;
+}
+
+	public String stadiumInfo(String stadiumName, String year, boolean csv) {
+	String info = "";
+	String sqlStatement ="SELECT stadium.\"stadiumName\", stadium.city, stadium.state, stadium.capacity, stadium.surface, stadium.\"yearOpened\" ";
+	sqlStatement += "FROM public.stadium ";
+	sqlStatement += "WHERE stadium.\"year\" = " + year + " ";
+	sqlStatement += "AND stadium.\"stadiumName\" = " + stadiumName;
+	System.out.println(sqlStatement);
+	try {
+	     //create a statement object
+	       Statement stmt = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result = stmt.executeQuery(sqlStatement);
+
+	       
+	       if(!csv) {
+	    	   info += "stadiumName" + " " + "city" + " " + "state" + " " + "capacity" + " " + "surface" + " " + "yearOpened";
+	       }
+	       else {
+	    	   info += "stadiumName" + "," + "city" + "," + "state" + "," + "capacity" + "," + "surface" + "," + "yearOpened";
+	       }
+	       info += "\n";
+	       //OUTPUT
+	       while (result.next()) {
+	    	   if(!csv) {
+	    		   info += result.getString("stadiumName") + " " + result.getString("city") + " " + result.getString("state") + " " + result.getString("capacity") + " " + result.getString("surface") + " " + result.getString("yearOpened");
+	    	   }
+	    	   else {
+	    		   info += result.getString("stadiumName") + "," + result.getString("city") + "," + result.getString("state") + "," + result.getString("capacity") + "," + result.getString("surface") + "," + result.getString("yearOpened");
+	    	   }
+	    	   info += "\n";
+	       }
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	
+	return info;
+}
+
+	public String gamesPlayedAtStadium(String stadiumName, String year, boolean csv) {
+	String info = "";
+	String sqlStatement = "SELECT stadium.\"stadiumName\", game.date, team.\"teamName\", stadium.capacity, game.attendance, stadium.surface,stadium.year ";
+	sqlStatement += "FROM public.stadium ";
+	sqlStatement += "INNER JOIN public.game ";
+	sqlStatement += "ON stadium.\"stadiumCode\" = game.\"stadiumCode\" ";
+	sqlStatement += "AND stadium.\"year\" = game.\"year\" ";
+	sqlStatement += "AND stadium.year = " + year + " ";
+	sqlStatement += "AND stadium.\"stadiumName\" = " + stadiumName + " ";
+	sqlStatement += "INNER JOIN team ";
+	sqlStatement += "ON team.\"teamCode\" = game.\"visitingTeamCode\" ";
+	sqlStatement += "AND stadium.year = team.year ";
+	System.out.println(sqlStatement);
+
+	try {
+	     //create a statement object
+	       Statement stmt = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result = stmt.executeQuery(sqlStatement);
+
+	       
+	       if(!csv) {
+	    	   info += "stadiumName" + " " + "date" + " " + "teamName" + " " + "capacity" + " " + "attendance" + " " + "surface" + " " + "year";
+	       }
+	       else {
+	    	   info += "stadiumName" + "," + "date" + "," + "teamName" + "," + "capacity" + "," + "attendance" + "," + "surface" + "," + "year";
+	       }
+	       info += "\n";
+	       //OUTPUT
+	       while (result.next()) {
+	    	   if(!csv) {
+	    		   info += result.getString("stadiumName") + " " + result.getString("date") + " " + result.getString("teamName") + " " + result.getString("capacity") + " " + result.getString("attendance") + " " + result.getString("surface") + " " + result.getString("year");
+	    	   }
+	    	   else {
+	    		   info += result.getString("stadiumName") + "," + result.getString("date") + "," + result.getString("teamName") + "," + result.getString("capacity") + "," + result.getString("attendance") + "," + result.getString("surface") + "," + result.getString("year");
+	    	   }
+			   info += "\n";
+
+	       }
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	
+		
+	return info;
+}
+
+	public String allStadiumsInfo(String year, boolean csv) {
+	String info = "";
+	String sqlStatement ="SELECT stadium.\"stadiumName\", stadium.city, stadium.state, stadium.capacity, stadium.surface, stadium.\"yearOpened\" ";
+	sqlStatement += "FROM public.stadium ";
+	sqlStatement += "WHERE stadium.\"year\" = " + year;
+	System.out.println(sqlStatement);
+	try {
+	     //create a statement object
+	       Statement stmt = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result = stmt.executeQuery(sqlStatement);
+
+	       
+	       if(!csv) {
+	    	   info += "stadiumName" + " " + "city" + " " + "state" + " " + "capacity" + " " + "surface" + " " + "yearOpened";
+	       }
+	       else {
+	    	   info += "stadiumName" + "," + "city" + "," + "state" + "," + "capacity" + "," + "surface" + "," + "yearOpened";
+	       }
+	       info += "\n";
+	       //OUTPUT
+	       while (result.next()) {
+	    	   if(!csv) {
+	    		   info += result.getString("stadiumName") + " " + result.getString("city") + " " + result.getString("state") + " " + result.getString("capacity") + " " + result.getString("surface") + " " + result.getString("yearOpened"); 
+	    	   }
+	    	   else {
+	    		   info += result.getString("stadiumName") + "," + result.getString("city") + "," + result.getString("state") + "," + result.getString("capacity") + "," + result.getString("surface") + "," + result.getString("yearOpened");
+	    	   }
+	    	   info += "\n";
+	       }
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	
+	
+	return info;
+}
 }
