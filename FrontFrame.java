@@ -1,5 +1,3 @@
-package exampleDBGUI;
-
 import java.sql.*;
 //import javax.swing.JOptionPane;
 import javax.swing.*; //gives me more access to GUI options
@@ -11,7 +9,7 @@ import java.awt.event.*;
 public class FrontFrame {
 	
 	public static void main(String args[]) {
-		dbSetup dbAccess = new dbSetup(); //variable to hold Joseph's login info
+		dbSetupExample dbAccess = new dbSetupExample(); //variable to hold Joseph's login info
 		Connection connect = null; //variable to track connection status
 		
 		SQLCommands x = new SQLCommands();
@@ -312,11 +310,11 @@ public class FrontFrame {
                     int messageType = -1;
                     String message = "";
                     if (command.equals("PLAYER")) {
-                        messageType = JOptionPane.INFORMATION_MESSAGE; //change this to get a real frame
-                        message = "Selecting this radio should show player search options";
+                    	playerSearchFrame psf = new playerSearchFrame();
+                  	  psf.setVisible(true);
                     } else if (command.equals("TEAM")) {
-                        messageType = JOptionPane.INFORMATION_MESSAGE;
-                        message = "Selecting this radio should show team search options";
+                    	teamSearchFrame tsf = new teamSearchFrame();
+                  	  tsf.setVisible(true);
                     } else if (command.equals("CONFERENCE")) {
                     	messageType = JOptionPane.showConfirmDialog(null, conferencePane, "Conference",
                     			JOptionPane.DEFAULT_OPTION);
