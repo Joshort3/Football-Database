@@ -79,10 +79,15 @@ public class FrontFrame {
 				if(index == 1) { //CVS
 					outChoice = true;
 				}
-				System.out.println(yearChoice);
-				System.out.println(outChoice);
 				//send to all conference function
-				
+				String output = x.allConferences(yearChoice, outChoice);
+				if(outChoice == false) {
+					JOptionPane.showMessageDialog(null, output);
+				} else {
+					csvCreator c = new csvCreator();
+					String fileOutputName = "all_conferences_" + yearChoice + ".csv";
+					c.CSV(output, fileOutputName);
+				}
 			}
 		});
 		getAllConferences.setText("All Conferences");
@@ -121,6 +126,14 @@ public class FrontFrame {
 					outChoice = true;
 				}
 				//send to get game information SQL
+				String output = x.gameInfo(homeName, visitingName, yearChoice, outChoice);
+				if(outChoice == false) {
+					JOptionPane.showMessageDialog(null, output);
+				} else {
+					csvCreator c = new csvCreator();
+					String fileOutputName = homeName + "_" + visitingName + ".csv";
+					c.CSV(output, fileOutputName);
+				}
 			}
 		});
 		gameInfo.setText("Get Game Information");
@@ -130,6 +143,8 @@ public class FrontFrame {
 			public void actionPerformed(ActionEvent e) {
 				String homeName = homeTeamName.getText();
 				homeName = "'" + homeName + "'";
+				String visitingName = visitingTeamName.getText();
+				visitingName = "'" + visitingName + "'";
 				int index = yearChoices.getSelectedIndex();
 				String yearChoice = years[index];
 				index = outputChoices.getSelectedIndex();
@@ -138,6 +153,14 @@ public class FrontFrame {
 					outChoice = true;
 				}
 				//send to get home team information SQL
+				String output = x.homeTeamStats(homeName, visitingName, yearChoice, outChoice);
+				if(outChoice == false) {
+					JOptionPane.showMessageDialog(null, output);
+				} else {
+					csvCreator c = new csvCreator();
+					String fileOutputName = homeName + ".csv";
+					c.CSV(output, fileOutputName);
+				}
 			}
 		});
 		homeInfo.setText("Home Team Stats");
@@ -145,6 +168,8 @@ public class FrontFrame {
 		visitingInfo.addActionListener(new ActionListener() {
 			//get visiting team information
 			public void actionPerformed(ActionEvent e) {
+				String homeName = homeTeamName.getText();
+				homeName = "'" + homeName + "'";
 				String visitingName = visitingTeamName.getText();
 				visitingName = "'" + visitingName + "'";
 				int index = yearChoices.getSelectedIndex();
@@ -155,9 +180,19 @@ public class FrontFrame {
 					outChoice = true;
 				}
 				//send to get visiting team information SQL
+				String output = x.visitingTeamStats(homeName, visitingName, yearChoice, outChoice);
+				if(outChoice == false) {
+					JOptionPane.showMessageDialog(null, output);
+				} else {
+					csvCreator c = new csvCreator();
+					String fileOutputName = visitingName + ".csv";
+					c.CSV(output, fileOutputName);
+				}
 			}
 		});
 		visitingInfo.setText("Visiting Team Stats");
+		JComboBox<String> yearChoices2 = new JComboBox<String>(years);
+		JComboBox<String> outputChoices2 = new JComboBox<String>(outputType);
 		
 		//Games Panel
 		JPanel gamePanel = new JPanel();
@@ -165,9 +200,9 @@ public class FrontFrame {
 		gamePanel.add(Box.createHorizontalStrut(10));
 		gamePanel.add(visitingTeamName);
 		gamePanel.add(Box.createHorizontalStrut(10));
-		gamePanel.add(yearChoices);
+		gamePanel.add(yearChoices2);
 		gamePanel.add(Box.createHorizontalStrut(10));
-		gamePanel.add(outputChoices);
+		gamePanel.add(outputChoices2);
 		gamePanel.add(Box.createHorizontalStrut(10));
 		gamePanel.add(gameInfo);
 		gamePanel.add(Box.createHorizontalStrut(10));
@@ -192,6 +227,14 @@ public class FrontFrame {
 					outChoice = true;
 				}
 				//send to get stadium info SQL
+				String output = x.stadiumInfo(stadiumName, yearChoice, outChoice);
+				if(outChoice == false) {
+					JOptionPane.showMessageDialog(null, output);
+				} else {
+					csvCreator c = new csvCreator();
+					String fileOutputName = stadiumName + ".csv";
+					c.CSV(output, fileOutputName);
+				}
 			}
 		});
 		stadiumInfo.setText("Stadium Info");
@@ -209,6 +252,14 @@ public class FrontFrame {
 					outChoice = true;
 				}
 				//send to get stadium info SQL
+				String output = x.gamesPlayedAtStadium(stadiumName, yearChoice, outChoice);
+				if(outChoice == false) {
+					JOptionPane.showMessageDialog(null, output);
+				} else {
+					csvCreator c = new csvCreator();
+					String fileOutputName = stadiumName + "_games" + ".csv";
+					c.CSV(output, fileOutputName);
+				}
 			}
 		});
 		gamesAtStadium.setText("Games Played at Stadium");
@@ -224,17 +275,27 @@ public class FrontFrame {
 					outChoice = true;
 				}
 				//send to get all stadium SQL
+				String output = x.allStadiumsInfo(yearChoice, outChoice);
+				if(outChoice == false) {
+					JOptionPane.showMessageDialog(null, output);
+				} else {
+					csvCreator c = new csvCreator();
+					String fileOutputName = "all_stadiums_" + yearChoice + ".csv";
+					c.CSV(output, fileOutputName);
+				}
 			}
 		});
 		allStadiums.setText("Get All Stadiums & Info");
+		JComboBox<String> yearChoices3 = new JComboBox<String>(years);
+		JComboBox<String> outputChoices3 = new JComboBox<String>(outputType);
 		
 		//Stadium Panel
 		JPanel stadiumPanel = new JPanel();
 		stadiumPanel.add(inputStadiumField);
 		stadiumPanel.add(Box.createHorizontalStrut(10));
-		stadiumPanel.add(yearChoices);
+		stadiumPanel.add(yearChoices3);
 		stadiumPanel.add(Box.createHorizontalStrut(10));
-		stadiumPanel.add(outputChoices);
+		stadiumPanel.add(outputChoices3);
 		stadiumPanel.add(Box.createHorizontalStrut(10));
 		stadiumPanel.add(stadiumInfo);
 		stadiumPanel.add(Box.createHorizontalStrut(10));
