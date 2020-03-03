@@ -331,11 +331,7 @@ public class FrontFrame {
                     	//messageType = JOptionPane.INFORMATION_MESSAGE;
                     	//message = "Selecting this radio should show game search information";
                     }
-                    // show message
-                    JOptionPane.showMessageDialog(frontFrame,
-                            message,
-                            "Message Dialog",
-                            messageType);
+                    
                 }
             }
         }
