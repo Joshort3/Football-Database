@@ -12,7 +12,7 @@ public class FrontFrame {
 		dbSetupExample dbAccess = new dbSetupExample(); //variable to hold Joseph's login info
 		Connection connect = null; //variable to track connection status
 		
-		SQLCommands x = new SQLCommands();
+		//SQLCommands x = new SQLCommands();
 		
 		try { //connect here
 			//Class.forName("org.postgresql.Driver"); //I have no idea what this does
@@ -38,14 +38,14 @@ public class FrontFrame {
                 AbstractButton button = (AbstractButton) ev.getItemSelectable();
                 String command = button.getActionCommand();
                 if (selected) {
-                    int messageType = -1;
-                    String message = "";
+                    //int messageType = -1;
+                    //String message = "";
                     if (command.equals("PLAYER")) {
                     	playerSearchFrame psf = new playerSearchFrame();
-                  	  	psf.setVisible(true);
+                  	  psf.setVisible(true);
                     } else if (command.equals("TEAM")) {
                     	teamSearchFrame tsf = new teamSearchFrame();
-                  	  	tsf.setVisible(true);
+                  	  tsf.setVisible(true);
                     } else if (command.equals("CONFERENCE")) {
                     	conferenceSearchFrame csf = new conferenceSearchFrame();
                     	csf.setVisible(true);
@@ -55,6 +55,10 @@ public class FrontFrame {
                     } else if (command.equals("GAMES")) {
                     	gameFrame gf = new gameFrame();
                     	gf.setVisible(true);
+                    }
+                    else if (command.equals("SPECIAL")) {
+                    	specialFuncFrame sff = new specialFuncFrame();
+                    	sff.setVisible(true);
                     }
                     
                 }
@@ -76,6 +80,9 @@ public class FrontFrame {
 		JRadioButton r5 = new JRadioButton("Games");
 		r5.setActionCommand("GAMES");
 		
+		JRadioButton r6 = new JRadioButton("Special Functions");
+		r6.setActionCommand("SPECIAL");
+		
 		//add event listener
 		MyItemListener myItemListener = new MyItemListener();
         r1.addItemListener(myItemListener);
@@ -83,6 +90,7 @@ public class FrontFrame {
         r3.addItemListener(myItemListener);
         r4.addItemListener(myItemListener);
         r5.addItemListener(myItemListener);
+        r6.addItemListener(myItemListener);
  
         // add radio buttons to a ButtonGroup
         final ButtonGroup group = new ButtonGroup();
@@ -91,6 +99,7 @@ public class FrontFrame {
         group.add(r3);
         group.add(r4);
 		group.add(r5);
+		group.add(r6);
 		
 		frontFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frontFrame.setSize(300, 200);
@@ -103,6 +112,7 @@ public class FrontFrame {
         cont.add(r3);
         cont.add(r4);
         cont.add(r5);
+        cont.add(r6);
  
         frontFrame.setVisible(true);
 	}
