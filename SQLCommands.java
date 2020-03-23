@@ -63,6 +63,87 @@ public class SQLCommands {
 		
 		
 	}
+
+	public String mostRushYards(String name) {
+		String yds = "";
+		int givenTeamCode = 0;
+		//get team code given name
+		String sqlStatement = "SELECT team.\"teamCode\" FROM team WHERE team.\"teamName\" = " + name;
+		System.out.println(sqlStatement);
+		try {
+		    //create a statement object
+			Statement stmt = conn.createStatement();
+		    //create an SQL statement
+		    //send statement to DBMS
+		    ResultSet result = stmt.executeQuery(sqlStatement);
+		    //OUTPUT
+		    while (result.next()) {
+		    	givenTeamCode = result.getInt(1);
+			    System.out.println("Team code is: " + givenTeamCode);
+			    break;
+		    }
+		} catch (Exception e){
+			System.out.println("Error accessing Database.");
+		}
+		//get all game codes from team game stats that have that team code
+		String sqlStatement2 = "SELECT \"teamGameStats\".\"gameCode\" FROM \"teamGameStats\" WHERE \"teamGameStats\".\"teamCode\" = " + givenTeamCode;
+		System.out.println(sqlStatement2);
+		int size = 0;
+		String[] gameCodes = null;
+		try {
+		    //create a statement object
+			Statement stmt2 = conn.createStatement();
+		    //create an SQL statement
+		    //send statement to DBMS
+		    ResultSet result2 = stmt2.executeQuery(sqlStatement2);
+		    int sz = 0;
+		    //source: https://www.javamadesoeasy.com/2015/11/how-to-get-lengthsize-of-resultset-in.html
+		    while (result2.next()) {
+		    	sz = sz + 1;
+		    }
+		    System.out.println("Number of games to check: " + sz);
+		    size = sz;
+		    //OUTPUT
+		    gameCodes = new String[sz];
+			int i = 0;
+			result2 = stmt2.executeQuery(sqlStatement2);
+		    while (result2.next()) {
+		    	gameCodes[i] = result2.getString(1);
+		    	//gc[i] = gameCodes[i];
+			    //System.out.println(gameCodes[i]);
+			    i = i + 1;
+		    }
+		} catch (Exception e){
+			System.out.println("Error accessing Database.");
+		}
+		//get all opposing teams with same game code
+		int maxYards = 0;
+		for (int j = 0; j < size; j++) {
+			String sqlStatement3 = "SELECT \"teamGameStats\".\"rushYard\" FROM \"teamGameStats\" WHERE \"teamGameStats\".\"gameCode\" = " + gameCodes[j];
+			sqlStatement3 += " AND NOT \"teamGameStats\".\"teamCode\" = " + givenTeamCode;
+			//System.out.println(sqlStatement3);
+			try {
+			    //create a statement object
+				Statement stmt3 = conn.createStatement();
+			    //create an SQL statement
+			    //send statement to DBMS
+			    ResultSet result3 = stmt3.executeQuery(sqlStatement3);
+			    //OUTPUT
+			    while (result3.next()) {
+			    	int rushYard = result3.getInt(1);
+			    	if (rushYard > maxYards) {
+			    		maxYards = rushYard;
+			    	}
+			    }
+			} catch (Exception e){
+				System.out.println("Error accessing Database.");
+			}
+		}
+		yds = "The max rush yards is " + maxYards;
+		//System.out.println(yds);
+		//find highest rushing yards from those games made by opposing team
+		return yds;
+	}
 	
 	public String playerInfo(String first, String last, String year, boolean csv) {
 		String info = "";
