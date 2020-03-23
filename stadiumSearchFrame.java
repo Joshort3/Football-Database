@@ -61,73 +61,73 @@ public class stadiumSearchFrame extends javax.swing.JFrame {
         
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	String stadiumName = jTextField1.getText();
-				stadiumName = "'" + stadiumName + "'";
-				int index = jComboBox1.getSelectedIndex();
-				String yearChoice = years[index];
-				index = jComboBox2.getSelectedIndex();
-				SQLCommands x = new SQLCommands();
-				boolean outChoice = false; //text box
-				if(index == 1) { //CVS
-					outChoice = true;
-				}
-				//send to get stadium info SQL
-				String output = x.stadiumInfo(stadiumName, yearChoice, outChoice);
-				if(outChoice == false) {
-					JOptionPane.showMessageDialog(null, output);
-				} else {
-					csvCreator c = new csvCreator();
-					String fileOutputName = stadiumName + ".csv";
-					c.CSV(output, fileOutputName);
-				}
-			}
-		});
+                String stadiumName = jTextField1.getText();
+                stadiumName = "'" + stadiumName + "'";
+                int index = jComboBox1.getSelectedIndex();
+                String yearChoice = years[index];
+                index = jComboBox2.getSelectedIndex();
+                SQLCommands x = new SQLCommands();
+                boolean outChoice = false; //text box
+                if(index == 1) { //CVS
+                    outChoice = true;
+                }
+                //send to get stadium info SQL
+                String output = x.stadiumInfo(stadiumName, yearChoice, outChoice);
+                if(outChoice == false) {
+                    JOptionPane.showMessageDialog(null, output);
+                } else {
+                    csvCreator c = new csvCreator();
+                    String fileOutputName = stadiumName + ".csv";
+                    c.CSV(output, fileOutputName);
+                }
+            }
+        });
         
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	String stadiumName = jTextField1.getText();
-				stadiumName = "'" + stadiumName + "'";
-				int index = jComboBox1.getSelectedIndex();
-				String yearChoice = years[index];
-				index = jComboBox2.getSelectedIndex();
-				SQLCommands x = new SQLCommands();
-				boolean outChoice = false; //text box
-				if(index == 1) { //CVS
-					outChoice = true;
-				}
-				//send to get stadium info SQL
-				String output = x.gamesPlayedAtStadium(stadiumName, yearChoice, outChoice);
-				if(outChoice == false) {
-					JOptionPane.showMessageDialog(null, output);
-				} else {
-					csvCreator c = new csvCreator();
-					String fileOutputName = stadiumName + "_games" + ".csv";
-					c.CSV(output, fileOutputName);
-				}
-			}
-		});
+                String stadiumName = jTextField1.getText();
+                stadiumName = "'" + stadiumName + "'";
+                int index = jComboBox1.getSelectedIndex();
+                String yearChoice = years[index];
+                index = jComboBox2.getSelectedIndex();
+                SQLCommands x = new SQLCommands();
+                boolean outChoice = false; //text box
+                if(index == 1) { //CVS
+                    outChoice = true;
+                }
+                //send to get stadium info SQL
+                String output = x.gamesPlayedAtStadium(stadiumName, yearChoice, outChoice);
+                if(outChoice == false) {
+                    JOptionPane.showMessageDialog(null, output);
+                } else {
+                    csvCreator c = new csvCreator();
+                    String fileOutputName = stadiumName + "_games" + ".csv";
+                    c.CSV(output, fileOutputName);
+                }
+            }
+        });
         
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	int index = jComboBox1.getSelectedIndex();
-				String yearChoice = years[index];
-				index = jComboBox2.getSelectedIndex();
-				SQLCommands x = new SQLCommands();
-				boolean outChoice = false; //text box
-				if(index == 1) { //CVS
-					outChoice = true;
-				}
-				//send to get all stadium SQL
-				String output = x.allStadiumsInfo(yearChoice, outChoice);
-				if(outChoice == false) {
-					JOptionPane.showMessageDialog(null, output);
-				} else {
-					csvCreator c = new csvCreator();
-					String fileOutputName = "all_stadiums_" + yearChoice + ".csv";
-					c.CSV(output, fileOutputName);
-				}
-			}
-		});
+                int index = jComboBox1.getSelectedIndex();
+                String yearChoice = years[index];
+                index = jComboBox2.getSelectedIndex();
+                SQLCommands x = new SQLCommands();
+                boolean outChoice = false; //text box
+                if(index == 1) { //CVS
+                    outChoice = true;
+                }
+                //send to get all stadium SQL
+                String output = x.allStadiumsInfo(yearChoice, outChoice);
+                if(outChoice == false) {
+                    JOptionPane.showMessageDialog(null, output);
+                } else {
+                    csvCreator c = new csvCreator();
+                    String fileOutputName = "all_stadiums_" + yearChoice + ".csv";
+                    c.CSV(output, fileOutputName);
+                }
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

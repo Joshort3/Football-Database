@@ -28,7 +28,7 @@ public class teamSearchFrame extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-    	jPanel1 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jComboBox1 = new javax.swing.JComboBox<>();
@@ -63,65 +63,65 @@ public class teamSearchFrame extends javax.swing.JFrame {
         
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	teamName = "'" + jTextField1.getText() + "'";
-            	int idx = jComboBox1.getSelectedIndex();
-            	String yr = years[idx];
-            	SQLCommands x = new SQLCommands();
-            	int opt = jComboBox2.getSelectedIndex();
-            	if (opt == 1) {
-            		csv = true;
-            	}
-            	String n = x.teamPlayer( teamName, yr, csv);
-            	if (!csv) {
-            		JOptionPane.showMessageDialog(null,n);
-            	}
-            	else {
-            		csvCreator c = new csvCreator();
-            		String fileN = teamName + ".csv";
-            		c.CSV(n, fileN);
-            	}
+                teamName = "'" + jTextField1.getText() + "'";
+                int idx = jComboBox1.getSelectedIndex();
+                String yr = years[idx];
+                SQLCommands x = new SQLCommands();
+                int opt = jComboBox2.getSelectedIndex();
+                if (opt == 1) {
+                    csv = true;
+                }
+                String n = x.teamPlayer( teamName, yr, csv);
+                if (!csv) {
+                    JOptionPane.showMessageDialog(null,n);
+                }
+                else {
+                    csvCreator c = new csvCreator();
+                    String fileN = teamName + ".csv";
+                    c.CSV(n, fileN);
+                }
             }
         });
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	teamName = "'" + jTextField1.getText() + "'";
-            	int idx = jComboBox1.getSelectedIndex();
-            	String yr = years[idx];
-            	SQLCommands x = new SQLCommands();
-            	int opt = jComboBox2.getSelectedIndex();
-            	if (opt == 1) {
-            		csv = true;
-            	}
-            	String n = x.teamStats( teamName, yr, csv);
-            	if (!csv) {
-            		JOptionPane.showMessageDialog(null,n);
-            	}
-            	else {
-            		csvCreator c = new csvCreator();
-            		String fileN = teamName + ".csv";
-            		c.CSV(n, fileN);
-            	}
+                teamName = "'" + jTextField1.getText() + "'";
+                int idx = jComboBox1.getSelectedIndex();
+                String yr = years[idx];
+                SQLCommands x = new SQLCommands();
+                int opt = jComboBox2.getSelectedIndex();
+                if (opt == 1) {
+                    csv = true;
+                }
+                String n = x.teamStats( teamName, yr, csv);
+                if (!csv) {
+                    JOptionPane.showMessageDialog(null,n);
+                }
+                else {
+                    csvCreator c = new csvCreator();
+                    String fileN = teamName + ".csv";
+                    c.CSV(n, fileN);
+                }
             }
         });
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	teamName = "'" + jTextField1.getText() + "'";
-            	int idx = jComboBox1.getSelectedIndex();
-            	String yr = years[idx];
-            	SQLCommands x = new SQLCommands();
-            	int opt = jComboBox2.getSelectedIndex();
-            	if (opt == 1) {
-            		csv = true;
-            	}
-            	String n = x.teamConference( teamName, yr, csv);
-            	if (!csv) {
-            		JOptionPane.showMessageDialog(null,n);
-            	}
-            	else {
-            		csvCreator c = new csvCreator();
-            		String fileN = teamName + ".csv";
-            		c.CSV(n, fileN);
-            	}
+                teamName = "'" + jTextField1.getText() + "'";
+                int idx = jComboBox1.getSelectedIndex();
+                String yr = years[idx];
+                SQLCommands x = new SQLCommands();
+                int opt = jComboBox2.getSelectedIndex();
+                if (opt == 1) {
+                    csv = true;
+                }
+                String n = x.teamConference( teamName, yr, csv);
+                if (!csv) {
+                    JOptionPane.showMessageDialog(null,n);
+                }
+                else {
+                    csvCreator c = new csvCreator();
+                    String fileN = teamName + ".csv";
+                    c.CSV(n, fileN);
+                }
             }
         });
 
