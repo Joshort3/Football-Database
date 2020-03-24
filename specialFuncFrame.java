@@ -1,4 +1,3 @@
-package exampleDBGUI;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -123,7 +122,13 @@ public class specialFuncFrame extends javax.swing.JFrame {
         shortChainButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 //function
-                
+            	String first1 = "'" + jTextField5.getText() + "'";
+            	String last1 = "'" + jTextField6.getText() + "'";
+            	String first2 = "'" + jTextField7.getText() + "'";
+            	String last2 = "'" + jTextField8.getText() + "'";
+            	SQLCommands x = new SQLCommands();
+            	String n = x.playerConnections(first1, last1, first2, last2);
+            	JOptionPane.showMessageDialog(null,n);
             }
         });
 

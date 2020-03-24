@@ -1,6 +1,6 @@
-package exampleDBGUI;
 
 import java.util.Vector;
+import java.util.Collections;
 import java.sql.*;
 public class SQLCommands {
 	
@@ -1062,5 +1062,322 @@ public class SQLCommands {
 		}
 		return info;
 	}
+	
+	public String playerConnections(String first1, String last1,String first2, String last2) {
+	String info = "";
+	String info1 = teamCon(first1, last1, first2, last2);
+	info = info1;
+	if(info.equals("") || info.substring(info.length() -1 ).equals(2)) {	
+		String info2 = hometownCon(first1, last1, first2, last2);
+		String info3 = gameCon(first1, last1, first2, last2);
+		if(!info2.equals("") && !info3.equals("")) {
+			if(info2.substring(info2.length()-1).compareTo(info3.substring(info3.length()-1)) <= 0) {
+				if(info1.equals("") || (info2.substring(info2.length()-1).compareTo(info1.substring(info1.length()-1)) < 0) )
+				info = info2;
+				else {
+					info = info3;
+				}
+			}
+			else {
+				info = info3;
+			}
+		}
+	}
+	
+	if(info.equals(""))
+		info = "No connection between players.";
+	else
+		info = info.substring(0,info.length() -1);
+	return info;
+}
+public String hometownCon(String first1, String last1,String first2, String last2) {
+	String info = "";
+	String sqlStatement1 = "SELECT  \"teamCode\", \"lastName\", \"firstName\", \"homeTown\", \"homeState\", year\n" + 
+			"	FROM public.player\n" + 
+			"	WHERE \"player\".\"firstName\" = ";
+	sqlStatement1 += first1  + '\n' +
+			"	AND \"lastName\" = ";
+	sqlStatement1 += last1  + ";";
+	
+	String sqlStatement2 = "SELECT  \"teamCode\", \"lastName\", \"firstName\", \"homeTown\", \"homeState\", year\n" + 
+			"	FROM public.player\n" + 
+			"	WHERE \"player\".\"firstName\" = ";
+	sqlStatement2 += first2  + '\n' +
+			"	AND \"lastName\" = ";
+	sqlStatement2 += last2  + ";";
+	//System.out.println(sqlStatement1);
+	//System.out.println(sqlStatement2);
+	try {
+	     //create a statement object
+	       Statement stmt1 = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result1 = stmt1.executeQuery(sqlStatement1);
+	       Statement stmt2 = conn.createStatement();
+	       ResultSet result2 = stmt2.executeQuery(sqlStatement2);
+	       //OUTPUT
+	       String hometown1 = "";
+	       String homeState1 = "";
+	       String hometown2 = "";
+	       String homeState2 = "";
+	       String teamCode2 = " ";
+	       while(result1.next()) {
+	    	   if(result1.getString("homeState") != null) {
+	    		   homeState1 = result1.getString("homeState");
+	    		   hometown1 = result1.getString("homeTown");
+	    	   }
+	       }
+	       while(result2.next()) {
+	    	   teamCode2 = result2.getString("teamCode");
+	    	   if(result2.getString("homeState") != null) {
+	    		   homeState2 = result2.getString("homeState");
+	    		   hometown2 = result2.getString("homeTown");
+	    		   teamCode2 =result2.getString("teamCode");
+	    	   }
+	       }
+	       
+	       if(hometown1.equals(hometown2) && homeState1.equals(homeState2)) {
+	    	   info = first1 + " " + last1 + " and " + first2 + " " + last2 + " are from the same hometown of " + hometown1 + "," + homeState1 + ".1";
+	       }
+	       
+	       else {
+	    	 String infoPoss = "";
+	    	  String connection = "5";
+	    	  String  sqlHomeTeam = "SELECT  \"teamCode\", \"lastName\", \"firstName\",\"homeTown\", \"homeState\", \"homeCountry\", year\n" + 
+	    	   		"	FROM public.player\n" + 
+	    	   		"	Where \"homeTown\" = '" + hometown1 + "';";
+	    	   Statement stmt = conn.createStatement();
+		       ResultSet result = stmt.executeQuery(sqlHomeTeam);
+		       String first = "";
+		       String last = ""; 
+		       while(result.next()) {
+		    	   //System.out.println(connection.compareTo(infoPoss.substring(infoPoss.length() - 1)) < 0);
+		    	   if(teamCode2.equals(result.getString("teamCode")) && (infoPoss.isEmpty() || (connection.compareTo(infoPoss.substring(infoPoss.length() - 1)) < 0))) {
+		    		   first = "'" + result.getString("firstName") + "'";
+		    		   last =  "'" + result.getString("lastName") + "'";
+		    		   infoPoss = teamCon(first, last, first2, last2); 
+		    		   connection = infoPoss.substring(infoPoss.length()-1);
+		    	   }
+		       }
+		       if (!infoPoss.isEmpty()) {
+		    	   connection = Integer.toString(Integer.parseInt(connection)+ 1);
+		    	   info = first1 + " " + last1 + " and " + first + " " + last + " are from the same hometown of " + hometown1 + "," + homeState1 + ", ";
+		    	   info += infoPoss.substring(0, infoPoss.length()-1) + (connection);
+		    	   //System.out.println(info); 
+		    	    
+		       }
+	       }
+
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	
+	return info;
+}
+public String teamCon(String first1, String last1,String first2, String last2) {
+	String info = "";
+	String sqlStatement1 = "SELECT  \"teamCode\", \"lastName\", \"firstName\", year\n" + 
+			"	FROM public.player\n" + 
+			"	WHERE \"firstName\" = ";
+	sqlStatement1 += first1  + '\n' +
+			"	AND \"lastName\" = ";
+	sqlStatement1 += last1  + ";";
+	
+	String sqlStatement2 = "SELECT  \"teamCode\", \"lastName\", \"firstName\", year\n" + 
+			"	FROM public.player\n" + 
+			"	WHERE \"firstName\" = ";
+	sqlStatement2 += first2  + '\n' +
+			"	AND \"lastName\" = ";
+	sqlStatement2 += last2  + ";";
+	
+	try {
+	     //create a statement object
+	       Statement stmt1 = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result1 = stmt1.executeQuery(sqlStatement1);
+	       Statement stmt2 = conn.createStatement();
+	       ResultSet result2 = stmt2.executeQuery(sqlStatement2);
+	       //OUTPUT
+	       result1.next();
+	       result2.next();
+	       if(result1.getInt("teamCode") == result2.getInt("teamCode")) {
+	    	   //System.out.println(sqlStatement1);
+	    	   //System.out.println(sqlStatement2);
+	    	   String sqlTeamStatment = "SELECT \"teamName\"\n" + 
+	    	   		"	FROM public.team\n" + 
+	    	   		"	WHERE \"teamCode\" = ";
+	    	   sqlTeamStatment += result1.getString("teamCode");
+	    	   Statement stmt3 = conn.createStatement();
+		       ResultSet result3 = stmt3.executeQuery(sqlTeamStatment);
+		       result3.next();
+	    	   Vector<String> years1 = new Vector<String>();
+	    	   Vector<String> years2 = new Vector<String>();
+	    	   years1.add(result1.getString("year"));
+	    	   while(result1.next()) {
+	    		   years1.add(result1.getString("year"));
+	    	   }
+	    	   years2.add(result2.getString("year"));
+	    	   while(result2.next()) {
+	    		   years2.add(result2.getString("year"));
+	    	   }
+	    	   Collections.sort(years1);
+	    	   Collections.sort(years2);
+	    	   int idx = -1;
+	    	   for(int i = 0; i < years1.size(); i++) {
+	    		   for(int j = 0; j < years2.size(); j++) {
+	    			   if(years1.elementAt(i).equals(years2.elementAt(j))) {
+	    				   idx = i;
+
+	    			   }
+		    	   }
+	    	   }
+	    	   if(idx == -1) {
+	    		   info = first1 + " " + last1 + " was on " + result3.getString("teamName") + " team from " + years1.elementAt(0);
+	    		   info += "-" + years1.elementAt(years1.size() - 1) + ", while " + first2 + " " + last2 + " was on the same team from ";
+	    		   info += years2.elementAt(0) + "-" +  years2.elementAt(years2.size() - 1) + ".2";
+	    	   }
+	    	   else {
+	    		   info = first1 + " " + last1 + " and  " + first2 + " " + last2 + " both were on " + result3.getString("teamName");
+	    		   info += " in " + years1.elementAt(idx) + ".1";
+	    	   }
+	       }
+
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	
+	return info;
+}
+
+public String gameCon(String first1, String last1,String first2, String last2) {
+	String info = "";
+	String sqlStatement1 = "SELECT \"team\".\"teamName\", \"player\".\"teamCode\", \"player\".\"lastName\", \"player\".\"firstName\", game.\"gameCode\", team.\"teamCode\", game.\"visitingTeamCode\", game.\"homeTeamCode\", \"player\".year\n" + 
+			"	FROM public.player\n" + 
+			"	INNER JOIN team\n" + 
+			"	ON team.year = \"player\".year\n" + 
+			"	AND \"player\".\"teamCode\" = team.\"teamCode\"\n" + 
+			"	AND \"player\".\"firstName\" = ";
+	sqlStatement1 += first1  + '\n' +
+			"	AND \"lastName\" = ";
+	sqlStatement1 += last1  + "\n" + 
+			"	INNER JOIN game\n" + 
+			"	ON game.year = team.year\n" + 
+			"	AND (game.\"visitingTeamCode\" = team.\"teamCode\"\n" + 
+			"	OR game.\"homeTeamCode\" = team.\"teamCode\");";
+	
+	String sqlStatement2 = "SELECT \"team\".\"teamName\", \"player\".\"teamCode\", \"player\".\"lastName\", \"player\".\"firstName\", game.\"gameCode\", team.\"teamCode\", game.\"visitingTeamCode\", game.\"homeTeamCode\", \"player\".year\n" + 
+			"	FROM public.player\n" + 
+			"	INNER JOIN team\n" + 
+			"	ON team.year = \"player\".year\n" + 
+			"	AND \"player\".\"teamCode\" = team.\"teamCode\"\n" + 
+			"	AND \"player\".\"firstName\" = ";
+	sqlStatement2 += first2  + '\n' +
+			"	AND \"lastName\" = ";
+	sqlStatement2 += last2  + "\n" + 
+			"	INNER JOIN game\n" + 
+			"	ON game.year = team.year\n" + 
+			"	AND (game.\"visitingTeamCode\" = team.\"teamCode\"\n" + 
+			"	OR game.\"homeTeamCode\" = team.\"teamCode\");";
+	
+	try {
+	     //create a statement object
+	       Statement stmt1 = conn.createStatement();
+	       //create an SQL statement
+	       //send statement to DBMS
+	       ResultSet result1 = stmt1.executeQuery(sqlStatement1);
+	       Statement stmt2 = conn.createStatement();
+	       ResultSet result2 = stmt2.executeQuery(sqlStatement2);
+	       //OUTPUT
+	       Vector<String> years1 = new Vector<String>(1000);
+	       Vector<String> game1 = new Vector<String>(1000);
+	       Vector<String> years2 = new Vector<String>(1000);
+	       Vector<String> game2 = new Vector<String>(1000);
+	       Vector<String> homeCode1 = new Vector<String>(1000);
+	       Vector<String> visitingCode1 = new Vector<String>(1000);
+	       Vector<String> homeCode2 = new Vector<String>(1000);
+	       Vector<String> visitingCode2 = new Vector<String>(1000);
+	       
+	       String team1 = "";
+	       String teamCode1 = "";
+	       String team2 = "";
+	       String teamCode2 = "";
+	       while(result1.next()) {
+	    	   years1.add(result1.getString("year"));
+	    	   game1.add(result1.getString("gameCode"));
+	    	   homeCode1.add(result1.getString("homeTeamCode"));
+	    	   visitingCode1.add(result1.getString("visitingTeamCode"));
+	    	   if(team1 == "") {
+	    		   team1 = result1.getString("teamName");
+	    		   teamCode1 = result1.getString("teamCode");
+	    	   }
+	       }
+	       
+	       while(result2.next()) {
+	    	   years2.add(result2.getString("year"));
+	    	   game2.add(result2.getString("gameCode"));
+	    	   homeCode2.add(result2.getString("homeTeamCode"));
+	    	   visitingCode2.add(result2.getString("visitingTeamCode"));
+	    	   if(team2 == "") {
+	    		   team2 = result2.getString("teamName");
+	    		   teamCode2 = result2.getString("teamCode");
+	    	   }
+	       }
+	
+	       String year = "";
+	       String code = "";
+	       
+	       for(int i = 0; i < years1.size(); i++) {
+    		   for(int j = 0; j < years2.size(); j++) {
+    			   if(game1.elementAt(i).equals(game2.elementAt(j)) && years1.elementAt(i).equals(years2.elementAt(j))) {
+    				  // if(year.compareTo(years1.elementAt(i)) == -1){
+    					   year = years1.elementAt(i);
+    					   code = game1.elementAt(i);
+    				   //}
+
+    			   }
+	    	   }
+	       }
+	       if(year != "") {
+	    	   info = first1 + " " + last1 + " played for " + team1 + " in " + year +", which played against " + team2 + " in " + year;
+	    	   info += ", which had " + first2 + " " + last2 + " in the game.1";
+	       }
+	       else {
+	    	   for(int i = 0; i < years1.size(); i++) {
+	    		   for(int j = 0; j < years2.size(); j++) {
+	    			   if(homeCode1.elementAt(i).equals(teamCode2) || visitingCode1.elementAt(i).equals(teamCode2)) {
+	    				  // if(year.compareTo(years1.elementAt(i)) == -1){
+	    					   info = first1 + " " + last1 + " played for " + team1 + " in " + years1.elementAt(i) + ", which played against " + team2;
+	    					   info += " in " + years1.elementAt(i) +  ", which is the team " + first2 + " " + last2 + " played for in " + years2.elementAt(0) + ".2";
+	    					   return info;
+	    				   //}
+	    			   }
+	    			   
+	    			   else if ((homeCode1.elementAt(i).equals(homeCode2.elementAt(j)) || visitingCode1.elementAt(i).equals(visitingCode2.elementAt(j))) && info.equals("")) {
+	    				   String interTeamCode = " ";
+	    				   if (!homeCode1.elementAt(i).equals(teamCode1))
+	    					   interTeamCode = homeCode1.elementAt(i);
+	    				   else
+	    					   interTeamCode = visitingCode1.elementAt(i);
+	    				   String sqlTeamName = "SELECT \"teamName\"\n" + 
+	    				   		"	FROM public.team\n" + 
+	    				   		"	WHERE \"teamCode\" = " + interTeamCode;
+	    				   Statement stmt = conn.createStatement();
+	    			       ResultSet result = stmt.executeQuery(sqlTeamName);
+	    			       result.next();
+	    				   info = first1 + " " + last1 + " played for " + team1 + " in " + years1.elementAt(i) + ", which played against " + result.getString("teamName");
+	    				   info += " in " + years1.elementAt(i) + " , which played " + team2 + "in " + years2.elementAt(j) + ", which is the team ";
+	    				   info += first2 + " " + last2 + " played for in " + years2.elementAt(j) + ".3";
+	    			   }
+		    	   }
+		       }
+	       }
+
+	} catch (Exception e){
+     System.out.println("Error accessing Database.");
+	}
+	
+	return info;
+}
 	//End Victory Chain Functions
 }
