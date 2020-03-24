@@ -1,3 +1,5 @@
+package exampleDBGUI;
+
 import java.util.Vector;
 import java.sql.*;
 public class SQLCommands {
@@ -13,7 +15,7 @@ public class SQLCommands {
 	private Connection conn;
 	
 	public SQLCommands() {
-		dbSetup my = new dbSetup();
+		dbSetupExample my = new dbSetupExample();
 	    //Building the connection
 	     conn = null;
 	     try {
@@ -812,4 +814,253 @@ public class SQLCommands {
 	
 	return info;
 }
+	
+	//Victory Chain Functions
+	public String victoryChainInfo(String winner, String loser, String year, boolean csv) {
+		String infoStart = "Victory Chain for " + winner.replace("'", "") + " over " + loser.replace("'", "")
+			+ " is:\n"; //output variable
+		String winnerTeamCode = "";
+		String loserTeamCode = "";
+		String info = "";
+		
+		try {
+			winnerTeamCode += getTeamCode(winner, year);
+			//System.out.println(winnerTeamCode);
+			
+			loserTeamCode += getTeamCode(loser, year);
+			//System.out.println(loserTeamCode);
+			
+			String winnerTeamGameCodesPlayed[] = getGameCodes(winnerTeamCode).split(",");
+			String loserTeamGameCodesPlayed[] = getGameCodes(loserTeamCode).split(",");
+			/*System.out.println(winnerTeamGameCodesPlayed.length);
+			for(int i = 0; i < winnerTeamGameCodesPlayed.length; i++) {
+				System.out.println(winnerTeamGameCodesPlayed[i]);
+			}*/
+			//direct chain
+			for(int i = 0; i < winnerTeamGameCodesPlayed.length; i++) {
+				for(int j = 0; j < loserTeamGameCodesPlayed.length; j++) {
+					if(winnerTeamGameCodesPlayed[i].equals(loserTeamGameCodesPlayed[j])) {
+						//System.out.println("Direct chain");
+						//determine who won
+						//if desired winner won, we have our chain
+						if(didWinnerWinGame(winnerTeamCode, loserTeamCode, winnerTeamGameCodesPlayed[i])) {
+							//System.out.println(winnerTeamGameCodesPlayed[i]);
+							info += loser.replace("'", "") + ", " + getGameYear(winnerTeamGameCodesPlayed[i]) + "\n";
+							//System.out.println(info);
+							return infoStart + info;
+						}
+					}
+				}
+			}
+			//2 chain
+			info += deeperChain(winnerTeamGameCodesPlayed, winnerTeamCode, loserTeamGameCodesPlayed, loserTeamCode, loser);
+			
+			//3 chain
+			/* Commented out due to taking over 10 minutes to run/test
+			if(info.equals("")) {
+				System.out.println("Potential 3 chain");
+				String teamsWinnerPlayed[][] = new String[winnerTeamGameCodesPlayed.length][2];
+				for(int i = 0; i < teamsWinnerPlayed.length; i++) {
+					teamsWinnerPlayed[i][0] = getTeamFromGame(winnerTeamGameCodesPlayed[i], winnerTeamCode);
+					teamsWinnerPlayed[i][1] = getGameYear(winnerTeamGameCodesPlayed[i]);
+				}
+				String listWinnerWon = "";
+				String listWinnerWonYear = "";
+				for(int i = 0; i < teamsWinnerPlayed.length; i++) {
+					if(didWinnerWinGame(winnerTeamCode, teamsWinnerPlayed[i][0], winnerTeamGameCodesPlayed[i])) {
+						listWinnerWon += teamsWinnerPlayed[i][0] + ",";
+						listWinnerWonYear += teamsWinnerPlayed[i][1] + ",";
+					}
+				}
+				String listWinnerWonArray[] = listWinnerWon.split(","); //array of all teamCodes winnerTeam beat
+				String listWinnerWonArrayYear[] = listWinnerWonYear.split(","); //array of all years
+				for(int i = 0; i < listWinnerWonArray.length; i++) {
+					System.out.println(listWinnerWonArray[i]);
+					String temp = getTeamNameFromCode(listWinnerWonArray[i]) + ", " + listWinnerWonArrayYear[i] + "\n"; //setup top level of chain
+					String teamGameCodesPlayed_lvl2[] = getGameCodes(listWinnerWonArray[i]).split(",");
+					info += deeperChain(teamGameCodesPlayed_lvl2, listWinnerWonArray[i], loserTeamGameCodesPlayed, loserTeamCode, loser);
+					if(!info.equals("")) {
+						info += temp + info;
+						return info;
+					}
+				}
+			}*/
+			if(info.equals("")) {
+				info += "The chain is too deep to be found in a timely manner.";
+			}
+		} catch(Exception e) {
+			System.out.println("Error accessing database");
+		}
+		
+		return infoStart + info;
+	}
+	
+	private String getTeamCode(String teamName, String year) {
+		String teamCodeString = "";
+		String sqlTeamCode = "SELECT team.\"teamCode\" FROM public.team";
+		sqlTeamCode += " WHERE team.\"teamName\" = " + teamName;
+		sqlTeamCode += " AND team.year = " + year;
+		//System.out.println(teamName);
+		try {
+			Statement stmt = conn.createStatement();
+			
+			ResultSet teamCodeResult = stmt.executeQuery(sqlTeamCode);			
+			while(teamCodeResult.next()) {
+				teamCodeString += teamCodeResult.getString("teamCode");
+			}
+			
+		} catch (Exception e) {
+			System.out.println("Could not get Team Code");
+		}
+		return teamCodeString;
+	}
+	
+	private String getGameCodes(String teamCode) { 
+		String gameCodesString = "";
+		String sqlGameCodes = "SELECT game.\"gameCode\" FROM public.game";
+		sqlGameCodes += " WHERE (game.\"homeTeamCode\" = " + teamCode + " OR game.\"visitingTeamCode\" = " + teamCode + ")";
+		
+		try {
+			Statement stmt = conn.createStatement();
+			
+			for(int i = 2005; i <= 2013; i++) {
+				String temp = sqlGameCodes + " AND game.year = " + i;
+				
+				ResultSet gameCodeResults = stmt.executeQuery(temp);
+				while(gameCodeResults.next()) {
+					gameCodesString += gameCodeResults.getString("gameCode") + ",";
+				}
+			}
+		} catch(Exception e) {
+			System.out.println("Could not get Game Codes");
+			System.out.println("TC: "+ teamCode);
+		}
+		//System.out.println(gameCodesString);
+		return gameCodesString;
+	}
+	
+	private boolean didWinnerWinGame(String winnerTeam, String loserTeam, String gameCode) {
+		boolean didWinnerWin = true;
+		try {
+			String winnerPoints = getGamePoints(gameCode, winnerTeam);
+			String loserPoints = getGamePoints(gameCode, loserTeam);
+			if(Integer.parseInt(winnerPoints) < Integer.parseInt(loserPoints)) {
+				didWinnerWin = false;
+			}
+		} catch(Exception e) {
+			System.out.println("Cannot determine a winner");
+		}
+		return didWinnerWin;
+	}
+	
+	private String getGamePoints(String gameCode, String teamCode) {
+		String points = "";
+		String sqlGetPoints = "SELECT \"teamGameStats\".points FROM public.\"teamGameStats\"";
+		sqlGetPoints += " WHERE \"teamGameStats\".\"gameCode\" = " + gameCode;
+		sqlGetPoints += " AND \"teamGameStats\".\"teamCode\" = " + teamCode;
+		//System.out.println(sqlGetPoints);
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet gamePointsResult = stmt.executeQuery(sqlGetPoints);
+			while(gamePointsResult.next()) {
+				points += gamePointsResult.getString("points");
+			}
+		} catch(Exception e) {
+			System.out.println("Could not get points");
+		}
+		
+		return points;
+	}
+	
+	private String getGameYear(String gameCode) {
+		String year = "";
+		String sqlGetYear = "SELECT game.year FROM public.game";
+		sqlGetYear += " WHERE game.\"gameCode\" = " + gameCode;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet gameYearResult = stmt.executeQuery(sqlGetYear);
+			while(gameYearResult.next()) {
+				year += gameYearResult.getString("year");
+			}
+		} catch(Exception e) {
+			System.out.println("Could not get year");
+		}
+		return year;
+	}
+	
+	private String getTeamFromGame(String gameCode, String redundantTeam) {
+		String teamCode = "";
+		String sqlGetTeam = "SELECT \"teamGameStats\".\"teamCode\" from public.\"teamGameStats\"";
+		sqlGetTeam += " WHERE \"teamGameStats\".\"gameCode\" = " + gameCode;
+		sqlGetTeam += " AND (NOT \"teamGameStats\".\"teamCode\" = " + redundantTeam + ")";
+		//System.out.println(sqlGetTeam);
+		
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet teamCodeResult = stmt.executeQuery(sqlGetTeam);
+			while(teamCodeResult.next()) {
+				teamCode += teamCodeResult.getString("teamCode");
+			}
+		} catch(Exception e) {
+			System.out.println("Cannot get teamCode from gameCode");
+		}
+		
+		return teamCode;
+	}
+	
+	private String getTeamNameFromCode(String teamCode) {
+		String teamName = "";
+		String sqlGetTeamName = "SELECT team.\"teamName\" FROM public.team";
+		sqlGetTeamName += " WHERE team.\"teamCode\" = " + teamCode;
+		sqlGetTeamName += " AND team.year = 2005";
+		
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet teamNameResult = stmt.executeQuery(sqlGetTeamName);
+			while(teamNameResult.next()) {
+				teamName += teamNameResult.getString("teamName");
+			}
+		} catch(Exception e) {
+			System.out.println("Could not get teamName from teamCode");
+		}
+		
+		return teamName;
+	}
+	
+	private String deeperChain(String winnerTeamGameCodesPlayed[], String winnerTeamCode, String loserTeamGameCodesPlayed[], String loserTeamCode, String loser) {
+		String info = "";
+		String teamsWinnerPlayed[][] = new String[winnerTeamGameCodesPlayed.length][2];
+		for(int i = 0; i < teamsWinnerPlayed.length; i++) {
+			teamsWinnerPlayed[i][0] = getTeamFromGame(winnerTeamGameCodesPlayed[i], winnerTeamCode);
+			teamsWinnerPlayed[i][1] = getGameYear(winnerTeamGameCodesPlayed[i]);
+		}
+		String listWinnerWon = "";
+		String listWinnerWonYear = "";
+		for(int i = 0; i < teamsWinnerPlayed.length; i++) {
+			if(didWinnerWinGame(winnerTeamCode, teamsWinnerPlayed[i][0], winnerTeamGameCodesPlayed[i])) {
+				listWinnerWon += teamsWinnerPlayed[i][0] + ",";
+				listWinnerWonYear += teamsWinnerPlayed[i][1] + ",";
+			}
+		}
+		String listWinnerWonArray[] = listWinnerWon.split(","); //array of all teamCodes winnerTeam beat
+		String listWinnerWonArrayYear[] = listWinnerWonYear.split(","); //array of all years
+		for(int i = 0; i < listWinnerWonArray.length; i++) {
+			String gamesWinnerWonTeamPlayed[] = getGameCodes(listWinnerWonArray[i]).split(",");
+			for(int j = 0; j < gamesWinnerWonTeamPlayed.length; j++) {
+				for(int k = 0; k < loserTeamGameCodesPlayed.length; k++) {
+					if(gamesWinnerWonTeamPlayed[j].equals(loserTeamGameCodesPlayed[k])) {
+						if(didWinnerWinGame(listWinnerWonArray[i], loserTeamCode, loserTeamGameCodesPlayed[k])) {
+							String winnerWonTeamCode = getTeamFromGame(loserTeamGameCodesPlayed[k], loserTeamCode);
+							String winnerWonTeamName = getTeamNameFromCode(winnerWonTeamCode);
+							info += winnerWonTeamName + ", " + listWinnerWonArrayYear[i] + "\n";
+							info += loser.replace("'", "") + ", " + getGameYear(loserTeamGameCodesPlayed[k]);
+							return info;
+						}
+					}
+				}
+			}
+		}
+		return info;
+	}
+	//End Victory Chain Functions
 }
