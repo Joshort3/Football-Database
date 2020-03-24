@@ -1,4 +1,4 @@
-package exampleDBGUI;
+//package exampleDBGUI;
 
 import java.sql.*;
 import javax.swing.JOptionPane;
