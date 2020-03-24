@@ -1,3 +1,5 @@
+package exampleDBGUI;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -93,7 +95,28 @@ public class specialFuncFrame extends javax.swing.JFrame {
         victChainButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 //function
-                
+            	String winnerName = jTextField3.getText();
+				winnerName = "'" + winnerName + "'";
+				String loserName = jTextField4.getText();
+				loserName = "'" + loserName + "'";
+				int index = jComboBox1.getSelectedIndex();
+				String yearChoice = years[index];
+				index = jComboBox2.getSelectedIndex();
+				boolean outChoice = false; //default to Text Box
+				SQLCommands x = new SQLCommands();
+				if(index == 1) {
+					outChoice = true; //set output to .csv
+				}
+				
+				String output = x.victoryChainInfo(winnerName, loserName, yearChoice, outChoice); //put function here to logic this...
+				
+				if(outChoice == false) {
+					JOptionPane.showMessageDialog(null, output);
+				} else {
+					csvCreator c = new csvCreator();
+					String fileOutName = winnerName + "_" + loserName + ".csv";
+					c.CSV(output, fileOutName);
+				}
             }
         });
 
