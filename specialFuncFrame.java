@@ -152,7 +152,24 @@ public class specialFuncFrame extends javax.swing.JFrame {
         homeAdvButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 //function
-                
+            	String confName = "'" + jTextField2.getText() + "'";
+            	Q4 y = new Q4();
+            	int opt = jComboBox2.getSelectedIndex();
+                int index = jComboBox1.getSelectedIndex();
+                String yearChoice = years[index];
+            	boolean csv = false;
+            	if (opt == 1) {
+            		csv = true;
+            	}
+            	String ranks = y.result(confName,yearChoice,false);
+            	if (csv == false) {
+            		JOptionPane.showMessageDialog(null,ranks);
+            	}
+            	else {
+            		csvCreator c = new csvCreator();
+            		String fileN =  "rushYards" + confName + ".csv";
+            		c.CSV(ranks, fileN);
+            	}
             }
         });
 
